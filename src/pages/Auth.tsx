@@ -32,7 +32,9 @@ const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    
+    // First sign up
+    const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -40,10 +42,24 @@ const Auth = () => {
         emailRedirectTo: window.location.origin,
       },
     });
-    if (error) {
-      toast.error(error.message);
+    
+    if (signUpError) {
+      toast.error(signUpError.message);
+      setLoading(false);
+      return;
+    }
+    
+    // Then immediately sign in
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    
+    if (signInError) {
+      toast.error("Account created! Please sign in to continue.");
+      // Switch to login tab
+      const loginTab = document.querySelector('[value="login"]') as HTMLElement;
+      if (loginTab) loginTab.click();
     } else {
-      toast.success("Check your email to confirm your account!");
+      toast.success("Welcome to ResumeAI!");
+      navigate("/");
     }
     setLoading(false);
   };
