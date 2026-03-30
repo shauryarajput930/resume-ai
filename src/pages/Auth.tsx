@@ -49,14 +49,22 @@ const Auth = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
-    if (error) {
-      toast.error(error.message || "Google sign-in failed");
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      if (error) {
+        console.error('Google auth error:', error);
+        toast.error(error.message || "Google sign-in failed");
+      } else {
+        console.log('Google auth initiated:', data);
+      }
+    } catch (err) {
+      console.error('Google auth exception:', err);
+      toast.error("Google sign-in is not configured. Please use email sign-in.");
     }
   };
 
