@@ -20,6 +20,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -27,12 +37,23 @@ const Index = () => {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [compareResume, setCompareResume] = useState("");
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   useEffect(() => {
     if (!user) { setProfile(null); return; }
     supabase.from("profiles").select("display_name, avatar_url").eq("id", user.id).single()
       .then(({ data }) => { if (data) setProfile(data); });
   }, [user]);
+
+  const handleLogout = () => {
+    setShowLogoutDialog(true);
+  };
+
+  const confirmLogout = async () => {
+    await signOut();
+    setShowLogoutDialog(false);
+    toast.success("Logged out successfully");
+  };
 
   const handleAnalyze = async (data: { resume: string; jobTitle: string; jobDescription: string }) => {
     if (!user) {
@@ -112,7 +133,7 @@ const Index = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut} className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive">
+                    <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive">
                       <LogOut className="w-4 h-4" />
                       Sign Out
                     </DropdownMenuItem>
@@ -268,6 +289,23 @@ const Index = () => {
           ResumeAI — AI-powered resume optimization for Applicant Tracking Systems
         </p>
       </footer>
+
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sign Out</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to sign out? You'll need to sign in again to access your analysis history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Sign Out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
