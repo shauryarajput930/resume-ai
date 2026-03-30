@@ -76,57 +76,15 @@ const Profile = () => {
   };
 
   const handleDownloadWebApp = () => {
-    // Create a PWA manifest-like experience
-    const shortcutData = {
-      name: "ResumeAI",
-      short_name: "ResumeAI",
-      description: "AI-powered resume analysis and optimization",
-      url: window.location.origin,
-      icons: [
-        {
-          src: "/favicon.ico",
-          sizes: "32x32",
-          type: "image/x-icon"
-        }
-      ]
-    };
-
-    // Create a simple HTML file for offline access
-    const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ResumeAI - Offline</title>
-    <style>
-        body { font-family: system-ui, sans-serif; padding: 20px; text-align: center; }
-        .logo { font-size: 2em; font-weight: bold; color: #2563eb; margin-bottom: 20px; }
-        .btn { background: #2563eb; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block; margin: 10px; }
-        .btn:hover { background: #1d4ed8; }
-    </style>
-</head>
-<body>
-    <div class="logo">🚀 ResumeAI</div>
-    <h1>Resume Analysis App</h1>
-    <p>This is a shortcut to ResumeAI. Click below to open the full app:</p>
-    <br>
-    <a href="${shortcutData.url}" class="btn">Open ResumeAI</a>
-    <br><br>
-    <small>Generated on ${new Date().toLocaleDateString()}</small>
-</body>
-</html>`;
-
-    const blob = new Blob([htmlContent], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
+    // Download the actual built app as a ZIP
+    const downloadUrl = "https://github.com/shauryarajput930/resume-ai/archive/refs/heads/main.zip";
     const a = document.createElement("a");
-    a.href = url;
-    a.download = "ResumeAI-Offline.html";
+    a.href = downloadUrl;
+    a.download = "ResumeAI-Source-Code.zip";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("Offline shortcut downloaded");
+    toast.success("Downloading ResumeAI source code...");
   };
 
   const handleInstallPWA = async () => {
@@ -150,31 +108,59 @@ const Profile = () => {
   };
 
   const handleDownloadDesktop = () => {
-    // For now, redirect to the web app with instructions
-    const instructions = `
-ResumeAI Desktop App Instructions
+    // Create a desktop app wrapper using Electron-like approach
+    const desktopAppContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeAI Desktop</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: system-ui, sans-serif;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+        }
+        .toolbar {
+            background: #1f2937;
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo {
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <div class="logo">🚀 ResumeAI</div>
+        <div style="margin-left: auto; font-size: 12px;">Desktop Version</div>
+    </div>
+    <iframe src="${window.location.origin}" frameborder="0"></iframe>
+</body>
+</html>`;
 
-1. Open Chrome/Edge browser
-2. Go to ${window.location.origin}
-3. Click the three dots menu (⋮)
-4. Select "Install ResumeAI" or "Create shortcut"
-5. Choose "Create desktop shortcut"
-
-This will create a desktop icon that opens ResumeAI as a desktop app.
-
-Generated on: ${new Date().toLocaleDateString()}
-    `;
-
-    const blob = new Blob([instructions], { type: "text/plain" });
+    const blob = new Blob([desktopAppContent], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "ResumeAI-Desktop-Instructions.txt";
+    a.download = "ResumeAI-Desktop.html";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success("Desktop instructions downloaded");
+    toast.success("Desktop app downloaded. Open the HTML file for desktop experience.");
   };
 
   const initials = displayName
@@ -288,8 +274,8 @@ Generated on: ${new Date().toLocaleDateString()}
               >
                 <Globe className="w-4 h-4" />
                 <div className="text-left">
-                  <div className="font-medium">Web App Shortcut</div>
-                  <div className="text-xs text-muted-foreground">Download offline shortcut</div>
+                  <div className="font-medium">Source Code</div>
+                  <div className="text-xs text-muted-foreground">Download complete source code</div>
                 </div>
               </Button>
 
@@ -313,7 +299,7 @@ Generated on: ${new Date().toLocaleDateString()}
                 <Monitor className="w-4 h-4" />
                 <div className="text-left">
                   <div className="font-medium">Desktop App</div>
-                  <div className="text-xs text-muted-foreground">Get desktop instructions</div>
+                  <div className="text-xs text-muted-foreground">Download desktop wrapper</div>
                 </div>
               </Button>
             </div>
